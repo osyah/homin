@@ -51,6 +51,8 @@ func NewApp() (*App, error) {
 			}
 
 			app.ctx.Signer = crypto.NewED25519(key.PrivateKey[:32])
+		} else {
+			app.ctx.Page = context.LoginPage
 		}
 	}
 
