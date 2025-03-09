@@ -89,6 +89,10 @@ func (c Channel) FormatMessage(message *delivery.Message) *homin.ChannelItem {
 }
 
 func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInput) (*delivery.Post, error) {
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
 	response, err := c.post.Create(ctx.Background(), input)
 	if err != nil {
 		return nil, err
