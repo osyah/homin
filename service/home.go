@@ -5,6 +5,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/google/uuid"
@@ -14,6 +16,11 @@ import (
 	"github.com/osyah/homin"
 	"github.com/osyah/homin/config"
 )
+
+var StringToChannelType = map[string]uint8{
+	"channel": homin.ChannelTypePrivate,
+	"chat":    homin.ChannelTypePublic,
+}
 
 type Home struct {
 	client   delivery.ChannelService
@@ -60,4 +67,47 @@ func (h *Home) GetChannels() ([]list.Item, error) {
 	}
 
 	return channels, nil
+}
+
+func (h *Home) Join(s string) (*homin.LocalChannel, error) {
+	v := strings.Split(s, "/")
+
+	if len(v) != 2 {
+		return nil, fmt.Errorf("homin/service: invalid join format")
+	}
+
+	channelType, ok := StringToChannelType[v[0]]
+	if !ok {
+		return nil, fmt.Errorf("homin/service: invalid join type")
+	}
+
+	id, err := uuid.Parse(v[1])
+	if err != nil {
+		return nil, err
+	}
+
+	channel, ok := h.channels[id]
+	if !ok {
+		channel, err := h.client.GetByID(context.Background(), id)
+		if err != nil {
+			return nil, err
+		}
+
+		h.channels[channel.ID] = channel
+	}
+
+	h.locals = append(h.locals, config.Channel{
+		Type: channelType, ID: id,
+	})
+
+	if err = config.SaveChannels(h.locals); err != nil {
+		return nil, err
+	}
+
+	return &homin.LocalChannel{
+		Channel:  channel,
+		Type:     channelType,
+		Posts:    buffer.NewRing[*homin.ChannelItem](20),
+		Messages: buffer.NewRing[*homin.ChannelItem](30),
+	}, nil
 }
