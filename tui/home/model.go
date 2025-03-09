@@ -6,6 +6,7 @@ package home
 import (
 	"log"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -28,10 +29,25 @@ func NewModel(ctx *context.Context, service *service.Home) Model {
 		log.Fatalln("homin/tui/home: " + err.Error())
 	}
 
-	list := list.New(channels, list.NewDefaultDelegate(), 20, 20)
+	delegate := list.NewDefaultDelegate()
+	delegate.UpdateFunc = delegateUpdate
+
+	list := list.New(channels, delegate, 20, 20)
 	list.Title = "Channels"
+	list.AdditionalFullHelpKeys = func() []key.Binding {
+		return []key.Binding{ModelKeys.Join}
+	}
 
 	return Model{ctx: ctx, list: list}
+}
+
+func delegateUpdate(msg tea.Msg, model *list.Model) tea.Cmd {
+	switch msg := msg.(type) {
+	case context.JoinChannel:
+		return model.InsertItem((len(model.Items()) + 1), msg.Local)
+	}
+
+	return nil
 }
 
 func (Model) Init() tea.Cmd { return nil }
@@ -49,6 +65,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEsc:
 			return m, tea.Quit
+		case tea.KeyCtrlJ:
+			m.ctx.Page = context.JoinPage
 		case tea.KeyEnter:
 			m.ctx.Channel = m.list.SelectedItem().(*homin.LocalChannel)
 			m.ctx.Page = context.ChannelPage
