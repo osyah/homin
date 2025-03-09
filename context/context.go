@@ -16,6 +16,7 @@ const (
 	LoginPage = 1 + iota
 	HomePage
 	ChannelPage
+	JoinPage
 )
 
 type Context struct {
@@ -28,3 +29,5 @@ type Context struct {
 func (Context) Background() context.Context { return context.Background() }
 
 type UpdateContent struct{}
+
+type JoinChannel struct{ Local *homin.LocalChannel }
