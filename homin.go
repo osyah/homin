@@ -11,7 +11,10 @@ import (
 	"strings"
 )
 
-const ModeTest = iota
+const (
+	ModeLocal = iota
+	ModeTest
+)
 
 var (
 	Mode = func() uint8 {
@@ -21,6 +24,8 @@ var (
 		flag.Parse()
 
 		switch strings.ToLower(mode) {
+		case "local":
+			return ModeLocal
 		case "test":
 			return ModeTest
 		default:
@@ -45,6 +50,8 @@ var (
 		}
 
 		switch Mode {
+		case ModeLocal:
+			return dir + "/Osyah/Homin Local"
 		case ModeTest:
 			return dir + "/Osyah/Homin Test"
 		default:
