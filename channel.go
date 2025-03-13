@@ -21,10 +21,8 @@ type ChannelItem struct {
 
 type LocalChannel struct {
 	*delivery.Channel
-	Type uint8
-
-	Posts    *buffer.Ring[*ChannelItem]
-	Messages *buffer.Ring[*ChannelItem]
+	Type    uint8
+	Content *buffer.Ring[*ChannelItem]
 }
 
 func (lc LocalChannel) Title() string {
@@ -36,17 +34,9 @@ func (lc LocalChannel) Title() string {
 }
 
 func (lc LocalChannel) Description() string {
-	switch lc.Type {
-	case ChannelTypePrivate:
-		last, ok := lc.Posts.Last()
-		if ok {
-			return last.Value
-		}
-	case ChannelTypePublic:
-		last, ok := lc.Messages.Last()
-		if ok {
-			return last.Value
-		}
+	last, ok := lc.Content.Last()
+	if ok {
+		return last.Value
 	}
 
 	return "Go to the channel to get the latest message!"
