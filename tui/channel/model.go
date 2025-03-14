@@ -78,9 +78,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					break
 				}
 
-				m.ctx.Channel.Posts.Add(m.service.FormatPost(post))
+				m.ctx.Channel.Content.Add(m.service.FormatPost(post))
 				m.viewPort.SetContent(
-					m.renderContent(m.ctx.Channel.Posts.Get()),
+					m.renderContent(m.ctx.Channel.Content.Get()),
 				)
 
 				m.textArea.Reset()
@@ -97,9 +97,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					break
 				}
 
-				m.ctx.Channel.Messages.Add(m.service.FormatMessage(message))
+				m.ctx.Channel.Content.Add(m.service.FormatMessage(message))
 				m.viewPort.SetContent(
-					m.renderContent(m.ctx.Channel.Messages.Get()),
+					m.renderContent(m.ctx.Channel.Content.Get()),
 				)
 
 				m.textArea.Reset()

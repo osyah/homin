@@ -20,7 +20,7 @@ func (m Model) updateChannelContent() Model {
 	case homin.ChannelTypePrivate:
 		var posts []*delivery.Post
 
-		last, ok := m.ctx.Channel.Posts.Last()
+		last, ok := m.ctx.Channel.Content.Last()
 		if !ok {
 			posts, err = m.service.GetPosts(m.ctx, &pletyvo.QueryOption{Limit: 20})
 			if err != nil {
@@ -50,14 +50,14 @@ func (m Model) updateChannelContent() Model {
 				continue
 			}
 
-			m.ctx.Channel.Posts.Add(m.service.FormatPost(post))
+			m.ctx.Channel.Content.Add(m.service.FormatPost(post))
 		}
 
-		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Posts.Get()))
+		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
 	case homin.ChannelTypePublic:
 		var messages []*delivery.Message
 
-		last, ok := m.ctx.Channel.Messages.Last()
+		last, ok := m.ctx.Channel.Content.Last()
 		if !ok {
 			messages, err = m.service.GetMessages(m.ctx, &pletyvo.QueryOption{Limit: 20})
 			if err != nil {
@@ -87,10 +87,10 @@ func (m Model) updateChannelContent() Model {
 				continue
 			}
 
-			m.ctx.Channel.Messages.Add(m.service.FormatMessage(message))
+			m.ctx.Channel.Content.Add(m.service.FormatMessage(message))
 		}
 
-		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Messages.Get()))
+		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
 	}
 
 	m.viewPort.GotoBottom()
