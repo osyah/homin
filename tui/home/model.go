@@ -24,7 +24,7 @@ type Model struct {
 }
 
 func NewModel(ctx *context.Context, service *service.Home) Model {
-	channels, err := service.GetChannels()
+	channels, err := service.GetChannels(ctx)
 	if err != nil {
 		log.Fatalln("homin/tui/home: " + err.Error())
 	}
@@ -35,7 +35,7 @@ func NewModel(ctx *context.Context, service *service.Home) Model {
 	list := list.New(channels, delegate, 20, 20)
 	list.Title = "Channels"
 	list.AdditionalFullHelpKeys = func() []key.Binding {
-		return []key.Binding{ModelKeys.Join}
+		return []key.Binding{ModelKeys.Join, ModelKeys.Create}
 	}
 
 	return Model{ctx: ctx, list: list}
@@ -67,6 +67,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, tea.Quit
 		case tea.KeyCtrlJ:
 			m.ctx.Page = context.JoinPage
+		case tea.KeyCtrlN:
+			m.ctx.Page = context.CreatePage
 		case tea.KeyEnter:
 			m.ctx.Channel = m.list.SelectedItem().(*homin.LocalChannel)
 			m.ctx.Page = context.ChannelPage

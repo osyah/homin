@@ -45,7 +45,7 @@ func (jm JoinModel) Update(msg tea.Msg) (JoinModel, tea.Cmd) {
 		case tea.KeyEsc:
 			jm.ctx.Page = context.HomePage
 		case tea.KeyEnter:
-			local, err := jm.service.Join(jm.textInput.Value())
+			local, err := jm.service.Join(jm.ctx, jm.textInput.Value())
 			if err != nil {
 				break
 			}
