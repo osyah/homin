@@ -7,9 +7,9 @@ require (
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/google/uuid v1.6.0
-	github.com/osyah/go-pletyvo v0.0.0-20250205211454-b0c49437d16b
-	github.com/osyah/go-pletyvo/client v0.0.0-20250205211454-b0c49437d16b
-	github.com/osyah/go-pletyvo/protocol/dapp/crypto v0.0.0-20250205211454-b0c49437d16b
+	github.com/osyah/go-pletyvo v0.0.2
+	github.com/osyah/go-pletyvo/client v0.0.0-20250313194404-62653c205468
+	github.com/osyah/go-pletyvo/protocol/dapp/crypto v0.0.0-20250313194404-62653c205468
 	github.com/osyah/hryzun v0.0.2
 	github.com/tyler-smith/go-bip39 v1.1.0
 )
@@ -30,7 +30,7 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
-	github.com/zeebo/blake3 v0.2.3 // indirect
+	github.com/zeebo/blake3 v0.2.4 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/sync v0.9.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect

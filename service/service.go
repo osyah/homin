@@ -3,7 +3,13 @@
 
 package service
 
-import "github.com/osyah/go-pletyvo/protocol/delivery"
+import (
+	"github.com/osyah/go-pletyvo/client/adapter/dapphttp"
+	"github.com/osyah/go-pletyvo/client/adapter/deliveryhttp"
+	"github.com/osyah/go-pletyvo/client/engine/http"
+
+	"github.com/osyah/homin/context"
+)
 
 type Service struct {
 	Login   *Login
@@ -11,10 +17,15 @@ type Service struct {
 	Channel *Channel
 }
 
-func New(service *delivery.Service) *Service {
+func New(ctx *context.Context) *Service {
+	engine := http.New(http.Config{URL: ctx.Config.Gateway})
+
+	eventService := dapphttp.NewEvent(engine)
+	deliveryClient := deliveryhttp.New(engine, ctx.Signer, eventService)
+
 	return &Service{
 		Login:   NewLogin(),
-		Home:    NewHome(service.Channel),
-		Channel: NewChannel(service),
+		Home:    NewHome(deliveryClient.Channel, eventService),
+		Channel: NewChannel(deliveryClient),
 	}
 }
