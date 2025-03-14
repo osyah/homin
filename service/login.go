@@ -32,7 +32,7 @@ func (Login) SaveKey(ctx *context.Context, phrase, password string) error {
 	ctx.Signer = crypto.NewED25519(bip39.NewSeed(phrase, password)[:32])
 
 	if err := config.SaveKey(ctx.Signer.Address(), config.Key{
-		PrivateKey: ctx.Signer.Private(),
+		PrivateKey: ctx.Signer.(*crypto.ED25519).Private(),
 	}); err != nil {
 		return err
 	}
