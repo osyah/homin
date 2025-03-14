@@ -8,11 +8,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/osyah/go-pletyvo/client/adapter/dapphttp"
-	"github.com/osyah/go-pletyvo/client/adapter/deliveryhttp"
-	"github.com/osyah/go-pletyvo/client/engine/http"
 	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
-	"github.com/osyah/go-pletyvo/protocol/delivery"
 
 	"github.com/osyah/homin/config"
 	"github.com/osyah/homin/context"
@@ -21,7 +17,6 @@ import (
 
 type App struct {
 	ctx     *context.Context
-	client  *delivery.Service
 	program *tea.Program
 }
 
@@ -56,13 +51,8 @@ func NewApp() (*App, error) {
 		}
 	}
 
-	engine := http.New(http.Config{URL: app.ctx.Config.Gateway})
-	app.client = deliveryhttp.New(
-		engine, app.ctx.Signer, dapphttp.NewEvent(engine),
-	)
-
 	app.program = tea.NewProgram(
-		NewModel(app.ctx, service.New(app.client)),
+		NewModel(app.ctx, service.New(app.ctx)),
 		tea.WithAltScreen(),
 	)
 

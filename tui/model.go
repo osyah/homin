@@ -20,6 +20,7 @@ type Model struct {
 	homeModel    home.Model
 	channelModel channel.Model
 	joinModel    home.JoinModel
+	createModel  home.CreateModel
 }
 
 func NewModel(ctx *context.Context, service *service.Service) Model {
@@ -29,6 +30,7 @@ func NewModel(ctx *context.Context, service *service.Service) Model {
 		homeModel:    home.NewModel(ctx, service.Home),
 		channelModel: channel.NewModel(ctx, service.Channel),
 		joinModel:    home.NewJoinModel(ctx, service.Home),
+		createModel:  home.NewCreateModel(ctx, service.Home),
 	}
 }
 
@@ -40,6 +42,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.channelModel = m.channelModel.Resize(&msg)
 		m.homeModel = m.homeModel.Resize(&msg)
 		m.joinModel = m.joinModel.Resize(&msg)
+		m.createModel = m.createModel.Resize(&msg)
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:
@@ -58,6 +61,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.channelModel, cmd = m.channelModel.Update(msg)
 	case context.JoinPage:
 		m.joinModel, cmd = m.joinModel.Update(msg)
+	case context.CreatePage:
+		m.createModel, cmd = m.createModel.Update(msg)
 	}
 
 	return m, cmd
@@ -73,6 +78,8 @@ func (m Model) View() string {
 		return m.channelModel.View()
 	case context.JoinPage:
 		return m.joinModel.View()
+	case context.CreatePage:
+		return m.createModel.View()
 	default:
 		return m.homeModel.View()
 	}
