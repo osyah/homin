@@ -23,6 +23,10 @@ func MakeConfig(ctx *context.Context) error {
 	var channels []config.Channel
 
 	switch homin.Mode {
+	case homin.ModeLocal:
+		ctx.Config = &config.Config{
+			Gateway: "http://localhost:8049/api",
+		}
 	case homin.ModeTest:
 		ctx.Config = &config.Config{
 			Gateway: "http://testnet.pletyvo.osyah.com/api",
