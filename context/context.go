@@ -17,6 +17,7 @@ const (
 	HomePage
 	ChannelPage
 	JoinPage
+	CreatePage
 )
 
 type Context struct {
