@@ -160,3 +160,23 @@ func (h *Home) Create(ctx *context.Context, input *delivery.ChannelCreateInput) 
 		},
 	}, nil
 }
+
+func (h *Home) Leave(channel *homin.LocalChannel) error {
+	for i, local := range h.locals {
+		if local.Type != channel.Type {
+			continue
+		}
+
+		if local.ID != channel.ID {
+			continue
+		}
+
+		h.locals = append(h.locals[:i], h.locals[1+i:]...)
+
+		if err := config.SaveChannels(h.locals); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
