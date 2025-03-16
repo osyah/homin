@@ -26,6 +26,6 @@ func New(ctx *context.Context) *Service {
 	return &Service{
 		Login:   NewLogin(),
 		Home:    NewHome(deliveryClient.Channel, eventService),
-		Channel: NewChannel(deliveryClient),
+		Channel: NewChannel(deliveryClient, eventService),
 	}
 }

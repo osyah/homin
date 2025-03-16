@@ -26,10 +26,15 @@ var (
 type Channel struct {
 	message delivery.MessageService
 	post    delivery.PostService
+	event   dapp.EventService
 }
 
-func NewChannel(service *delivery.Service) *Channel {
-	return &Channel{message: service.Message, post: service.Post}
+func NewChannel(client *delivery.Service, event dapp.EventService) *Channel {
+	return &Channel{
+		message: client.Message,
+		post:    client.Post,
+		event:   event,
+	}
 }
 
 func (c Channel) GetPosts(ctx *context.Context, option *pletyvo.QueryOption) ([]*delivery.Post, error) {
@@ -53,6 +58,7 @@ func (c Channel) FormatPost(post *delivery.Post) *homin.ChannelItem {
 	return &homin.ChannelItem{
 		Key:   post.ID,
 		Value: builder.String(),
+		Hash:  post.Hash,
 	}
 }
 
@@ -85,21 +91,42 @@ func (c Channel) FormatMessage(message *delivery.Message) *homin.ChannelItem {
 	return &homin.ChannelItem{
 		Key:   input.ID,
 		Value: builder.String(),
+		Hash:  crypto.NewHash(message.Auth.Schema, message.Auth.Signature),
 	}
 }
 
 func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInput) (*delivery.Post, error) {
-	if err := input.Validate(); err != nil {
+	err := input.Validate()
+	if err != nil {
 		return nil, err
 	}
 
-	response, err := c.post.Create(ctx.Background(), input)
+	var body dapp.EventBody
+
+	last, ok := ctx.Channel.Content.Last()
+	if ok {
+		body = dapp.NewEventBody(
+			dapp.EventBodyLinked, dapp.JSONDataType, delivery.PostCreate, input,
+		)
+		body.SetParent(last.Hash)
+	} else {
+		body = dapp.NewEventBody(
+			dapp.EventBodyBasic, dapp.JSONDataType, delivery.PostCreate, input,
+		)
+	}
+
+	event := &dapp.EventInput{Body: body, Auth: ctx.Signer.Auth(body)}
+
+	response, err := c.event.Create(ctx.Background(), event)
 	if err != nil {
 		return nil, err
 	}
 
 	return &delivery.Post{
 		ID:      response.ID,
+		Author:  ctx.Signer.Address(),
+		Hash:    crypto.NewHash(event.Auth.Schema, event.Auth.Signature),
+		Channel: ctx.Channel.ID,
 		Content: input.Content,
 	}, nil
 }
