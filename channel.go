@@ -5,6 +5,7 @@ package homin
 
 import (
 	"github.com/google/uuid"
+	"github.com/osyah/go-pletyvo/protocol/dapp"
 	"github.com/osyah/go-pletyvo/protocol/delivery"
 	"github.com/osyah/hryzun/buffer"
 )
@@ -17,6 +18,7 @@ const (
 type ChannelItem struct {
 	Key   uuid.UUID
 	Value string
+	Hash  dapp.Hash
 }
 
 type LocalChannel struct {
