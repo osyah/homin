@@ -19,7 +19,9 @@ import (
 var homeModelStyle = lipgloss.NewStyle().Padding(1, 2)
 
 type Model struct {
-	ctx  *context.Context
+	ctx     *context.Context
+	service *service.Home
+
 	list list.Model
 }
 
@@ -35,10 +37,14 @@ func NewModel(ctx *context.Context, service *service.Home) Model {
 	list := list.New(channels, delegate, 20, 20)
 	list.Title = "Channels"
 	list.AdditionalFullHelpKeys = func() []key.Binding {
-		return []key.Binding{ModelKeys.Join, ModelKeys.Create}
+		return []key.Binding{
+			ModelKeys.Join,
+			ModelKeys.Create,
+			ModelKeys.Leave,
+		}
 	}
 
-	return Model{ctx: ctx, list: list}
+	return Model{ctx: ctx, service: service, list: list}
 }
 
 func delegateUpdate(msg tea.Msg, model *list.Model) tea.Cmd {
@@ -69,6 +75,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.ctx.Page = context.JoinPage
 		case tea.KeyCtrlN:
 			m.ctx.Page = context.CreatePage
+		case tea.KeyCtrlL:
+			err := m.service.Leave(m.list.SelectedItem().(*homin.LocalChannel))
+			if err != nil {
+				break
+			}
+
+			m.list.RemoveItem(m.list.Index())
 		case tea.KeyEnter:
 			m.ctx.Channel = m.list.SelectedItem().(*homin.LocalChannel)
 			m.ctx.Page = context.ChannelPage

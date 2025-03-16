@@ -8,6 +8,7 @@ import "github.com/charmbracelet/bubbles/key"
 type ModelKeyMap struct {
 	Join   key.Binding
 	Create key.Binding
+	Leave  key.Binding
 }
 
 var ModelKeys = ModelKeyMap{
@@ -18,5 +19,9 @@ var ModelKeys = ModelKeyMap{
 	Create: key.NewBinding(
 		key.WithKeys("ctrl+n"),
 		key.WithHelp("ctrl+n", "create channel"),
+	),
+	Leave: key.NewBinding(
+		key.WithKeys("ctrl+l"),
+		key.WithHelp("ctrl+l", "leave channel"),
 	),
 }
