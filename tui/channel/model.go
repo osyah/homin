@@ -57,7 +57,7 @@ func (m Model) Resize(wsm *tea.WindowSizeMsg) Model {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case context.UpdateContent:
-		return m.updateChannelContent(), nil
+		m = m.updateChannelContent()
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEsc:
