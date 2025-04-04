@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/google/uuid"
 	"github.com/osyah/go-pletyvo"
 	"github.com/osyah/go-pletyvo/protocol/dapp"
 	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
@@ -45,7 +44,16 @@ func (c Channel) GetMessages(ctx *context.Context, option *pletyvo.QueryOption) 
 	return c.message.Get(ctx.Background(), ctx.Channel.ID, option)
 }
 
-func (c Channel) FormatPost(post *delivery.Post) *homin.ChannelItem {
+func (c Channel) FormatPost(post *delivery.Post) (*homin.ChannelItem, error) {
+	post.Content = delivery.PrepareContent(post.Content)
+	if len(post.Content) == 0 {
+		return nil, delivery.ErrEmptyContent
+	}
+
+	return c.renderPost(post), nil
+}
+
+func (c Channel) renderPost(post *delivery.Post) *homin.ChannelItem {
 	var builder strings.Builder
 
 	builder.WriteString(
@@ -62,21 +70,25 @@ func (c Channel) FormatPost(post *delivery.Post) *homin.ChannelItem {
 	}
 }
 
-func (c Channel) FormatMessage(message *delivery.Message) *homin.ChannelItem {
-	var (
-		builder strings.Builder
-		input   delivery.MessageInput
-		author  dapp.Hash
-	)
+func (c Channel) FormatMessage(message *delivery.Message) (*homin.ChannelItem, error) {
+	var input delivery.MessageInput
 
 	if err := message.Body.Unmarshal(&input); err != nil {
-		return &homin.ChannelItem{
-			Key:   uuid.Must(uuid.NewV7()),
-			Value: "<invalid message>",
-		}
+		return nil, err
 	}
 
-	author = crypto.NewHash(message.Auth.Schema, message.Auth.PublicKey)
+	content := delivery.PrepareContent(input.Content)
+	if len(content) == 0 {
+		return nil, delivery.ErrEmptyContent
+	}
+
+	return c.renderMessage(message, &input), nil
+}
+
+func (c Channel) renderMessage(message *delivery.Message, input *delivery.MessageInput) *homin.ChannelItem {
+	author := crypto.NewHash(message.Auth.Schema, message.Auth.PublicKey).String()
+
+	var builder strings.Builder
 
 	builder.WriteString(
 		timeStyle.Render(
@@ -84,7 +96,7 @@ func (c Channel) FormatMessage(message *delivery.Message) *homin.ChannelItem {
 		),
 	)
 	builder.WriteString(
-		senderStyle.Render(author.String()[:5] + "..." + author.String()[38:] + " "),
+		senderStyle.Render(author[:5] + "..." + author[38:] + " "),
 	)
 	builder.WriteString(input.Content)
 
@@ -95,10 +107,15 @@ func (c Channel) FormatMessage(message *delivery.Message) *homin.ChannelItem {
 	}
 }
 
-func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInput) (*delivery.Post, error) {
+func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInput) (*homin.ChannelItem, error) {
 	err := input.Validate()
 	if err != nil {
 		return nil, err
+	}
+
+	input.Content = delivery.PrepareContent(input.Content)
+	if len(input.Content) == 0 {
+		return nil, delivery.ErrEmptyContent
 	}
 
 	var body dapp.EventBody
@@ -122,18 +139,24 @@ func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInpu
 		return nil, err
 	}
 
-	return &delivery.Post{
+	return c.renderPost(&delivery.Post{
 		ID:      response.ID,
 		Author:  ctx.Signer.Address(),
 		Hash:    crypto.NewHash(event.Auth.Schema, event.Auth.Signature),
 		Channel: ctx.Channel.ID,
 		Content: input.Content,
-	}, nil
+	}), nil
 }
 
-func (c Channel) SendMessage(ctx *context.Context, input *delivery.MessageInput) (*delivery.Message, error) {
-	if err := input.Validate(); err != nil {
+func (c Channel) SendMessage(ctx *context.Context, input *delivery.MessageInput) (*homin.ChannelItem, error) {
+	err := input.Validate()
+	if err != nil {
 		return nil, err
+	}
+
+	input.Content = delivery.PrepareContent(input.Content)
+	if len(input.Content) == 0 {
+		return nil, delivery.ErrEmptyContent
 	}
 
 	body := dapp.NewEventBody(
@@ -142,5 +165,9 @@ func (c Channel) SendMessage(ctx *context.Context, input *delivery.MessageInput)
 
 	message := &delivery.Message{Body: body, Auth: ctx.Signer.Auth(body)}
 
-	return message, c.message.Send(ctx.Background(), message)
+	if err = c.message.Send(ctx.Background(), message); err != nil {
+		return nil, err
+	}
+
+	return c.renderMessage(message, input), nil
 }

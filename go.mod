@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/google/uuid v1.6.0
-	github.com/osyah/go-pletyvo v0.0.2
+	github.com/osyah/go-pletyvo v0.0.3
 	github.com/osyah/go-pletyvo/client v0.0.0-20250313194404-62653c205468
 	github.com/osyah/go-pletyvo/protocol/dapp/crypto v0.0.0-20250313194404-62653c205468
 	github.com/osyah/hryzun v0.0.2
