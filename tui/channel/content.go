@@ -14,7 +14,10 @@ import (
 )
 
 func (m Model) updateChannelContent() Model {
-	var err error
+	var (
+		err  error
+		item *homin.ChannelItem
+	)
 
 	switch m.ctx.Channel.Type {
 	case homin.ChannelTypePrivate:
@@ -50,7 +53,12 @@ func (m Model) updateChannelContent() Model {
 				continue
 			}
 
-			m.ctx.Channel.Content.Add(m.service.FormatPost(post))
+			item, err = m.service.FormatPost(post)
+			if err != nil {
+				continue
+			}
+
+			m.ctx.Channel.Content.Add(item)
 		}
 
 		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
@@ -87,7 +95,12 @@ func (m Model) updateChannelContent() Model {
 				continue
 			}
 
-			m.ctx.Channel.Content.Add(m.service.FormatMessage(message))
+			item, err = m.service.FormatMessage(message)
+			if err != nil {
+				continue
+			}
+
+			m.ctx.Channel.Content.Add(item)
 		}
 
 		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))

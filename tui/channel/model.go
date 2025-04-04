@@ -73,12 +73,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					},
 				}
 
-				post, err := m.service.CreatePost(m.ctx, input)
+				item, err := m.service.CreatePost(m.ctx, input)
 				if err != nil {
 					break
 				}
 
-				m.ctx.Channel.Content.Add(m.service.FormatPost(post))
+				m.ctx.Channel.Content.Add(item)
 				m.viewPort.SetContent(
 					m.renderContent(m.ctx.Channel.Content.Get()),
 				)
@@ -92,12 +92,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 					Content: m.textArea.Value(),
 				}
 
-				message, err := m.service.SendMessage(m.ctx, input)
+				item, err := m.service.SendMessage(m.ctx, input)
 				if err != nil {
 					break
 				}
 
-				m.ctx.Channel.Content.Add(m.service.FormatMessage(message))
+				m.ctx.Channel.Content.Add(item)
 				m.viewPort.SetContent(
 					m.renderContent(m.ctx.Channel.Content.Get()),
 				)
