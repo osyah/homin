@@ -77,8 +77,8 @@ func (c Channel) FormatMessage(message *delivery.Message) (*homin.ChannelItem, e
 		return nil, err
 	}
 
-	content := delivery.PrepareContent(input.Content)
-	if len(content) == 0 {
+	input.Content = delivery.PrepareContent(input.Content)
+	if len(input.Content) == 0 {
 		return nil, delivery.ErrEmptyContent
 	}
 
