@@ -15,6 +15,7 @@ type Service struct {
 	Login   *Login
 	Home    *Home
 	Channel *Channel
+	Contact *Contact
 }
 
 func New(ctx *context.Context) *Service {
@@ -23,9 +24,12 @@ func New(ctx *context.Context) *Service {
 	eventService := dapphttp.NewEvent(engine)
 	deliveryClient := deliveryhttp.New(engine, ctx.Signer, eventService)
 
+	contact := NewContact()
+
 	return &Service{
 		Login:   NewLogin(),
 		Home:    NewHome(deliveryClient.Channel, eventService),
-		Channel: NewChannel(deliveryClient, eventService),
+		Channel: NewChannel(deliveryClient, eventService, contact),
+		Contact: contact,
 	}
 }

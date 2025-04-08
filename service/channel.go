@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/osyah/go-pletyvo"
 	"github.com/osyah/go-pletyvo/protocol/dapp"
 	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
@@ -17,22 +16,19 @@ import (
 	"github.com/osyah/homin/context"
 )
 
-var (
-	timeStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
-	senderStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
-)
-
 type Channel struct {
 	message delivery.MessageService
 	post    delivery.PostService
 	event   dapp.EventService
+	contact *Contact
 }
 
-func NewChannel(client *delivery.Service, event dapp.EventService) *Channel {
+func NewChannel(client *delivery.Service, event dapp.EventService, contact *Contact) *Channel {
 	return &Channel{
 		message: client.Message,
 		post:    client.Post,
 		event:   event,
+		contact: contact,
 	}
 }
 
@@ -56,11 +52,10 @@ func (c Channel) FormatPost(post *delivery.Post) (*homin.ChannelItem, error) {
 func (c Channel) renderPost(post *delivery.Post) *homin.ChannelItem {
 	var builder strings.Builder
 
-	builder.WriteString(
-		timeStyle.Render(
-			time.Unix(post.ID.Time().UnixTime()).Format("02/01 15:04 "),
-		),
-	)
+	builder.WriteString("\033[32m")
+	builder.WriteString(time.Unix(post.ID.Time().UnixTime()).Format("02/01 15:04 "))
+	builder.WriteString("\033[0m")
+
 	builder.WriteString(post.Content)
 
 	return &homin.ChannelItem{
@@ -90,14 +85,24 @@ func (c Channel) renderMessage(message *delivery.Message, input *delivery.Messag
 
 	var builder strings.Builder
 
-	builder.WriteString(
-		timeStyle.Render(
-			time.Unix(input.ID.Time().UnixTime()).Format("02/01 15:04 "),
-		),
-	)
-	builder.WriteString(
-		senderStyle.Render(author[:5] + "..." + author[38:] + " "),
-	)
+	builder.WriteString("\033[32m")
+	builder.WriteString(time.Unix(input.ID.Time().UnixTime()).Format("02/01 15:04 "))
+	builder.WriteString("\033[0m")
+
+	contact, ok := c.contact.locals[author]
+	if ok {
+		builder.WriteString("\033[1;33m")
+		builder.WriteString(contact.Name)
+		builder.WriteString("\033[0m")
+	} else {
+		builder.WriteString("\033[90m")
+		builder.WriteString(author[:5])
+		builder.WriteString("...")
+		builder.WriteString(author[38:])
+		builder.WriteString("\033[0m")
+	}
+
+	builder.WriteByte(' ')
 	builder.WriteString(input.Content)
 
 	return &homin.ChannelItem{
