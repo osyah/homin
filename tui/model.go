@@ -10,6 +10,7 @@ import (
 	"github.com/osyah/homin/service"
 	"github.com/osyah/homin/tui/auth"
 	"github.com/osyah/homin/tui/channel"
+	"github.com/osyah/homin/tui/contact"
 	"github.com/osyah/homin/tui/home"
 )
 
@@ -21,6 +22,7 @@ type Model struct {
 	channelModel channel.Model
 	joinModel    home.JoinModel
 	createModel  home.CreateModel
+	contactModel contact.Model
 }
 
 func NewModel(ctx *context.Context, service *service.Service) Model {
@@ -31,6 +33,7 @@ func NewModel(ctx *context.Context, service *service.Service) Model {
 		channelModel: channel.NewModel(ctx, service.Channel),
 		joinModel:    home.NewJoinModel(ctx, service.Home),
 		createModel:  home.NewCreateModel(ctx, service.Home),
+		contactModel: contact.NewModel(ctx, service.Contact),
 	}
 }
 
@@ -43,6 +46,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.homeModel = m.homeModel.Resize(&msg)
 		m.joinModel = m.joinModel.Resize(&msg)
 		m.createModel = m.createModel.Resize(&msg)
+		m.contactModel = m.contactModel.Resize(&msg)
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:
@@ -63,6 +67,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.joinModel, cmd = m.joinModel.Update(msg)
 	case context.CreatePage:
 		m.createModel, cmd = m.createModel.Update(msg)
+	case context.ContactPage:
+		m.contactModel, cmd = m.contactModel.Update(msg)
 	}
 
 	return m, cmd
@@ -80,6 +86,8 @@ func (m Model) View() string {
 		return m.joinModel.View()
 	case context.CreatePage:
 		return m.createModel.View()
+	case context.ContactPage:
+		return m.contactModel.View()
 	default:
 		return m.homeModel.View()
 	}
