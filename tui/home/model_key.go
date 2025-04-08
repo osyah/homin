@@ -6,9 +6,10 @@ package home
 import "github.com/charmbracelet/bubbles/key"
 
 type ModelKeyMap struct {
-	Join   key.Binding
-	Create key.Binding
-	Leave  key.Binding
+	Join    key.Binding
+	Create  key.Binding
+	Leave   key.Binding
+	Contact key.Binding
 }
 
 var ModelKeys = ModelKeyMap{
@@ -23,5 +24,9 @@ var ModelKeys = ModelKeyMap{
 	Leave: key.NewBinding(
 		key.WithKeys("ctrl+l"),
 		key.WithHelp("ctrl+l", "leave channel"),
+	),
+	Contact: key.NewBinding(
+		key.WithKeys("ctrl+f"),
+		key.WithHelp("ctrl+f", "find contact"),
 	),
 }

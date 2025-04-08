@@ -41,6 +41,7 @@ func NewModel(ctx *context.Context, service *service.Home) Model {
 			ModelKeys.Join,
 			ModelKeys.Create,
 			ModelKeys.Leave,
+			ModelKeys.Contact,
 		}
 	}
 
@@ -75,6 +76,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.ctx.Page = context.JoinPage
 		case tea.KeyCtrlN:
 			m.ctx.Page = context.CreatePage
+		case tea.KeyCtrlF:
+			m.ctx.Page = context.ContactPage
 		case tea.KeyCtrlL:
 			err := m.service.Leave(m.list.SelectedItem().(*homin.LocalChannel))
 			if err != nil {
