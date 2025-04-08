@@ -71,7 +71,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEsc:
-			return m, tea.Quit
+			if !m.list.FilteringEnabled() {
+				return m, tea.Quit
+			}
 		case tea.KeyCtrlJ:
 			m.ctx.Page = context.JoinPage
 		case tea.KeyCtrlN:
