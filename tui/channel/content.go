@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/charmbracelet/x/ansi"
 	"github.com/osyah/go-pletyvo"
 	"github.com/osyah/go-pletyvo/protocol/delivery"
 
@@ -132,5 +133,5 @@ func (m Model) renderContent(items []*homin.ChannelItem) string {
 		builder.WriteString(item.Value)
 	}
 
-	return builder.String()
+	return ansi.Wrap(builder.String(), m.viewPort.Width, "")
 }

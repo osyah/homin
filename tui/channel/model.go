@@ -51,6 +51,13 @@ func (m Model) Resize(wsm *tea.WindowSizeMsg) Model {
 
 	m.textArea.SetWidth(wsm.Width)
 
+	if m.ctx.Channel != nil {
+		m.viewPort.SetContent(
+			m.renderContent(m.ctx.Channel.Content.Get()),
+		)
+		m.viewPort.GotoBottom()
+	}
+
 	return m
 }
 
