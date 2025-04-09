@@ -64,7 +64,7 @@ func (h *Home) GetChannels(ctx *context.Context) ([]list.Item, error) {
 		channels[i] = &homin.LocalChannel{
 			Channel: channel,
 			Type:    local.Type,
-			Content: buffer.NewRing[*homin.ChannelItem](30),
+			Content: buffer.NewRing[*homin.ChannelItem](ctx.Config.BufferSize),
 		}
 	}
 
@@ -151,12 +151,12 @@ func (h *Home) Create(ctx *context.Context, input *delivery.ChannelCreateInput) 
 		{
 			Channel: channel,
 			Type:    homin.ChannelTypePrivate,
-			Content: buffer.NewRing[*homin.ChannelItem](30),
+			Content: buffer.NewRing[*homin.ChannelItem](ctx.Config.BufferSize),
 		},
 		{
 			Channel: channel,
 			Type:    homin.ChannelTypePublic,
-			Content: buffer.NewRing[*homin.ChannelItem](30),
+			Content: buffer.NewRing[*homin.ChannelItem](ctx.Config.BufferSize),
 		},
 	}, nil
 }
