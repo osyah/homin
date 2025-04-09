@@ -25,11 +25,13 @@ func MakeConfig(ctx *context.Context) error {
 	switch homin.Mode {
 	case homin.ModeLocal:
 		ctx.Config = &config.Config{
-			Gateway: "http://localhost:8049/api",
+			Gateway:    "http://localhost:8049/api",
+			BufferSize: config.DefaultBufferSize,
 		}
 	case homin.ModeTest:
 		ctx.Config = &config.Config{
-			Gateway: "http://testnet.pletyvo.osyah.com/api",
+			Gateway:    "http://testnet.pletyvo.osyah.com/api",
+			BufferSize: config.DefaultBufferSize,
 		}
 
 		channels = []config.Channel{
