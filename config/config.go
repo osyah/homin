@@ -10,9 +10,19 @@ import (
 	"github.com/osyah/homin"
 )
 
+const DefaultBufferSize = 50
+
 type Config struct {
 	Gateway string `json:"gateway"`
 	Auth    *Auth  `json:"auth,omitempty"`
+
+	BufferSize int `json:"buffer_size"`
+}
+
+func (c *Config) Prepare() {
+	if c.BufferSize == 0 {
+		c.BufferSize = DefaultBufferSize
+	}
 }
 
 func (c Config) Save() error {
@@ -44,6 +54,8 @@ func New() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	config.Prepare()
 
 	return &config, nil
 }
