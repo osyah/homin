@@ -43,3 +43,9 @@ func (c *Contact) Get(*context.Context) ([]list.Item, error) {
 
 	return contacts, nil
 }
+
+func (c Contact) Delete(contact *homin.LocalContact) error {
+	delete(c.locals, contact.Hash)
+
+	return config.SaveContacts(c.locals)
+}
