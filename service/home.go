@@ -90,7 +90,7 @@ func (h *Home) Join(ctx *context.Context, link string) (*homin.LocalChannel, err
 
 	channel, ok := h.channels[id]
 	if !ok {
-		channel, err := h.client.GetByID(ctx.Background(), id)
+		channel, err = h.client.GetByID(ctx.Background(), id)
 		if err != nil {
 			return nil, err
 		}
@@ -176,6 +176,8 @@ func (h *Home) Leave(channel *homin.LocalChannel) error {
 		if err := config.SaveChannels(h.locals); err != nil {
 			return err
 		}
+
+		break
 	}
 
 	return nil
