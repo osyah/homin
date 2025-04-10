@@ -26,7 +26,7 @@ func (m Model) updateChannelContent() Model {
 
 		last, ok := m.ctx.Channel.Content.Last()
 		if !ok {
-			posts, err = m.service.GetPosts(m.ctx, &pletyvo.QueryOption{Limit: 20})
+			posts, err = m.service.GetPosts(m.ctx, &pletyvo.QueryOption{Limit: 25})
 			if err != nil {
 				if err == pletyvo.CodeNotFound {
 					m.viewPort.SetContent(
@@ -49,6 +49,10 @@ func (m Model) updateChannelContent() Model {
 			}
 		}
 
+		if len(posts) == 0 {
+			return m
+		}
+
 		for _, post := range posts {
 			if post == nil {
 				continue
@@ -61,14 +65,12 @@ func (m Model) updateChannelContent() Model {
 
 			m.ctx.Channel.Content.Add(item)
 		}
-
-		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
 	case homin.ChannelTypePublic:
 		var messages []*delivery.Message
 
 		last, ok := m.ctx.Channel.Content.Last()
 		if !ok {
-			messages, err = m.service.GetMessages(m.ctx, &pletyvo.QueryOption{Limit: 20})
+			messages, err = m.service.GetMessages(m.ctx, &pletyvo.QueryOption{Limit: 25})
 			if err != nil {
 				if err == pletyvo.CodeNotFound {
 					m.viewPort.SetContent(
@@ -91,6 +93,10 @@ func (m Model) updateChannelContent() Model {
 			}
 		}
 
+		if len(messages) == 0 {
+			return m
+		}
+
 		for _, message := range messages {
 			if message == nil {
 				continue
@@ -103,11 +109,14 @@ func (m Model) updateChannelContent() Model {
 
 			m.ctx.Channel.Content.Add(item)
 		}
-
-		m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
 	}
 
-	m.viewPort.GotoBottom()
+	bottomPosition := m.viewPort.AtBottom()
+	m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
+
+	if bottomPosition {
+		m.viewPort.GotoBottom()
+	}
 
 	return m
 }
