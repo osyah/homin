@@ -6,10 +6,12 @@ package contact
 import (
 	"log"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/osyah/homin"
 	"github.com/osyah/homin/context"
 	"github.com/osyah/homin/service"
 )
@@ -31,6 +33,11 @@ func NewModel(ctx *context.Context, service *service.Contact) Model {
 
 	list := list.New(items, list.NewDefaultDelegate(), 20, 20)
 	list.Title = "Contacts"
+	list.AdditionalFullHelpKeys = func() []key.Binding {
+		return []key.Binding{
+			ModelKeys.Delete,
+		}
+	}
 
 	return Model{ctx: ctx, service: service, list: list}
 }
@@ -49,9 +56,18 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEsc:
-			if !m.list.FilteringEnabled() {
-				return m, tea.Quit
+			if m.list.FilterState() == list.Unfiltered {
+				m.ctx.Page = context.HomePage
+
+				return m, nil
 			}
+		case tea.KeyCtrlD:
+			err := m.service.Delete(m.list.SelectedItem().(*homin.LocalContact))
+			if err != nil {
+				break
+			}
+
+			m.list.RemoveItem(m.list.Index())
 		}
 	}
 
