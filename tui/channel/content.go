@@ -49,10 +49,6 @@ func (m Model) updateChannelContent() Model {
 			}
 		}
 
-		if len(posts) == 0 {
-			return m
-		}
-
 		for _, post := range posts {
 			if post == nil {
 				continue
@@ -93,10 +89,6 @@ func (m Model) updateChannelContent() Model {
 			}
 		}
 
-		if len(messages) == 0 {
-			return m
-		}
-
 		for _, message := range messages {
 			if message == nil {
 				continue
@@ -111,11 +103,14 @@ func (m Model) updateChannelContent() Model {
 		}
 	}
 
-	bottomPosition := m.viewPort.AtBottom()
-	m.viewPort.SetContent(m.renderContent(m.ctx.Channel.Content.Get()))
+	items := m.ctx.Channel.Content.Get()
+	if len(items) != 0 {
+		bottomPosition := m.viewPort.AtBottom()
+		m.viewPort.SetContent(m.renderContent(items))
 
-	if bottomPosition {
-		m.viewPort.GotoBottom()
+		if bottomPosition {
+			m.viewPort.GotoBottom()
+		}
 	}
 
 	return m
