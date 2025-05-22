@@ -6,7 +6,7 @@ package context
 import (
 	"context"
 
-	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
+	"github.com/osyah/go-pletyvo/dapp"
 
 	"github.com/osyah/homin"
 	"github.com/osyah/homin/config"
@@ -24,7 +24,7 @@ const (
 type Context struct {
 	Page    uint8
 	Config  *config.Config
-	Signer  crypto.Signer
+	Signer  dapp.Signer
 	Channel *homin.LocalChannel
 }
 

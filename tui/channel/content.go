@@ -9,7 +9,8 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 	"github.com/osyah/go-pletyvo"
-	"github.com/osyah/go-pletyvo/protocol/delivery"
+	"github.com/osyah/go-pletyvo/dapp"
+	"github.com/osyah/go-pletyvo/delivery"
 
 	"github.com/osyah/homin"
 )
@@ -62,7 +63,7 @@ func (m Model) updateChannelContent() Model {
 			m.ctx.Channel.Content.Add(item)
 		}
 	case homin.ChannelTypePublic:
-		var messages []*delivery.Message
+		var messages []*dapp.Event
 
 		last, ok := m.ctx.Channel.Content.Last()
 		if !ok {

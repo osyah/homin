@@ -1,6 +1,6 @@
 module github.com/osyah/homin
 
-go 1.21.1
+go 1.24.2
 
 require (
 	github.com/charmbracelet/bubbles v0.20.0
@@ -8,10 +8,8 @@ require (
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/charmbracelet/x/ansi v0.4.5
 	github.com/google/uuid v1.6.0
-	github.com/osyah/go-pletyvo v0.0.3
-	github.com/osyah/go-pletyvo/client v0.0.0-20250313194404-62653c205468
-	github.com/osyah/go-pletyvo/protocol/dapp/crypto v0.0.0-20250313194404-62653c205468
-	github.com/osyah/hryzun v0.0.2
+	github.com/osyah/go-pletyvo v0.1.1
+	github.com/osyah/hryzun v0.1.0
 	github.com/tyler-smith/go-bip39 v1.1.0
 )
 

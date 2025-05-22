@@ -8,7 +8,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
+	"github.com/osyah/go-pletyvo/dapp"
 
 	"github.com/osyah/homin/config"
 	"github.com/osyah/homin/context"
@@ -45,7 +45,7 @@ func NewApp() (*App, error) {
 				return nil, err
 			}
 
-			app.ctx.Signer = crypto.NewED25519(key.PrivateKey[:32])
+			app.ctx.Signer = dapp.NewED25519(key.PrivateKey[:32])
 		} else {
 			app.ctx.Page = context.LoginPage
 		}

@@ -8,7 +8,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/osyah/go-pletyvo/protocol/delivery"
+	"github.com/osyah/go-pletyvo/delivery"
 
 	"github.com/osyah/homin/context"
 	"github.com/osyah/homin/service"

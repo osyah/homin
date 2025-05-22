@@ -4,7 +4,7 @@
 package service
 
 import (
-	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
+	"github.com/osyah/go-pletyvo/dapp"
 	"github.com/tyler-smith/go-bip39"
 
 	"github.com/osyah/homin/config"
@@ -29,10 +29,10 @@ func (Login) SaveKey(ctx *context.Context, phrase, password string) error {
 		return bip39.ErrInvalidMnemonic
 	}
 
-	ctx.Signer = crypto.NewED25519(bip39.NewSeed(phrase, password)[:32])
+	ctx.Signer = dapp.NewED25519(bip39.NewSeed(phrase, password)[:32])
 
 	if err := config.SaveKey(ctx.Signer.Address(), config.Key{
-		PrivateKey: ctx.Signer.(*crypto.ED25519).Private(),
+		PrivateKey: ctx.Signer.(*dapp.ED25519).Private(),
 	}); err != nil {
 		return err
 	}

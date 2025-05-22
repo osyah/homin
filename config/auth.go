@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/osyah/go-pletyvo/protocol/dapp"
+	"github.com/osyah/go-pletyvo/dapp"
 
 	"github.com/osyah/homin"
 )

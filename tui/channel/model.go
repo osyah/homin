@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/google/uuid"
-	"github.com/osyah/go-pletyvo/protocol/delivery"
+	"github.com/osyah/go-pletyvo/delivery"
 
 	"github.com/osyah/homin"
 	"github.com/osyah/homin/context"

@@ -8,9 +8,8 @@ import (
 	"time"
 
 	"github.com/osyah/go-pletyvo"
-	"github.com/osyah/go-pletyvo/protocol/dapp"
-	"github.com/osyah/go-pletyvo/protocol/dapp/crypto"
-	"github.com/osyah/go-pletyvo/protocol/delivery"
+	"github.com/osyah/go-pletyvo/dapp"
+	"github.com/osyah/go-pletyvo/delivery"
 
 	"github.com/osyah/homin"
 	"github.com/osyah/homin/context"
@@ -36,7 +35,7 @@ func (c Channel) GetPosts(ctx *context.Context, option *pletyvo.QueryOption) ([]
 	return c.post.Get(ctx.Background(), ctx.Channel.ID, option)
 }
 
-func (c Channel) GetMessages(ctx *context.Context, option *pletyvo.QueryOption) ([]*delivery.Message, error) {
+func (c Channel) GetMessages(ctx *context.Context, option *pletyvo.QueryOption) ([]*dapp.Event, error) {
 	return c.message.Get(ctx.Background(), ctx.Channel.ID, option)
 }
 
@@ -65,10 +64,10 @@ func (c Channel) renderPost(post *delivery.Post) *homin.ChannelItem {
 	}
 }
 
-func (c Channel) FormatMessage(message *delivery.Message) (*homin.ChannelItem, error) {
+func (c Channel) FormatMessage(event *dapp.Event) (*homin.ChannelItem, error) {
 	var input delivery.MessageInput
 
-	if err := message.Body.Unmarshal(&input); err != nil {
+	if err := event.Body.Unmarshal(&input); err != nil {
 		return nil, err
 	}
 
@@ -77,11 +76,11 @@ func (c Channel) FormatMessage(message *delivery.Message) (*homin.ChannelItem, e
 		return nil, delivery.ErrEmptyContent
 	}
 
-	return c.renderMessage(message, &input), nil
+	return c.renderMessage(event, &input), nil
 }
 
-func (c Channel) renderMessage(message *delivery.Message, input *delivery.MessageInput) *homin.ChannelItem {
-	author := crypto.NewHash(message.Auth.Schema, message.Auth.PublicKey).String()
+func (c Channel) renderMessage(event *dapp.Event, input *delivery.MessageInput) *homin.ChannelItem {
+	author := dapp.NewHash(event.Auth.Schema, event.Auth.PublicKey).String()
 
 	var builder strings.Builder
 
@@ -108,7 +107,7 @@ func (c Channel) renderMessage(message *delivery.Message, input *delivery.Messag
 	return &homin.ChannelItem{
 		Key:   input.ID,
 		Value: builder.String(),
-		Hash:  crypto.NewHash(message.Auth.Schema, message.Auth.Signature),
+		Hash:  dapp.NewHash(event.Auth.Schema, event.Auth.Signature),
 	}
 }
 
@@ -147,7 +146,7 @@ func (c Channel) CreatePost(ctx *context.Context, input *delivery.PostCreateInpu
 	return c.renderPost(&delivery.Post{
 		ID:      response.ID,
 		Author:  ctx.Signer.Address(),
-		Hash:    crypto.NewHash(event.Auth.Schema, event.Auth.Signature),
+		Hash:    dapp.NewHash(event.Auth.Schema, event.Auth.Signature),
 		Channel: ctx.Channel.ID,
 		Content: input.Content,
 	}), nil
@@ -168,11 +167,11 @@ func (c Channel) SendMessage(ctx *context.Context, input *delivery.MessageInput)
 		dapp.EventBodyBasic, dapp.JSONDataType, delivery.MessageCreate, &input,
 	)
 
-	message := &delivery.Message{Body: body, Auth: ctx.Signer.Auth(body)}
+	event := &dapp.EventInput{Body: body, Auth: ctx.Signer.Auth(body)}
 
-	if err = c.message.Send(ctx.Background(), message); err != nil {
+	if err = c.message.Send(ctx.Background(), event); err != nil {
 		return nil, err
 	}
 
-	return c.renderMessage(message, input), nil
+	return c.renderMessage(&dapp.Event{ID: input.ID, Body: event.Body, Auth: event.Auth}, input), nil
 }

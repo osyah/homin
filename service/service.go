@@ -4,9 +4,9 @@
 package service
 
 import (
-	"github.com/osyah/go-pletyvo/client/adapter/dapphttp"
-	"github.com/osyah/go-pletyvo/client/adapter/deliveryhttp"
-	"github.com/osyah/go-pletyvo/client/engine/http"
+	"github.com/osyah/go-pletyvo"
+	"github.com/osyah/go-pletyvo/dapp"
+	"github.com/osyah/go-pletyvo/delivery"
 
 	"github.com/osyah/homin/context"
 )
@@ -19,10 +19,10 @@ type Service struct {
 }
 
 func New(ctx *context.Context) *Service {
-	engine := http.New(http.Config{URL: ctx.Config.Gateway})
+	engine := pletyvo.NewEngine(pletyvo.EngineConfig{URL: ctx.Config.Gateway})
 
-	eventService := dapphttp.NewEvent(engine)
-	deliveryClient := deliveryhttp.New(engine, ctx.Signer, eventService)
+	eventService := dapp.NewEventClient(engine)
+	deliveryClient := delivery.NewClient(engine, ctx.Signer, eventService)
 
 	contact := NewContact()
 
